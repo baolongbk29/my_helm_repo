@@ -1,0 +1,1360 @@
+connectors:
+  affinity: {}
+  command: []
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1003
+  contextPath: ''
+  enabled: true
+  env: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  image:
+    pullSecrets: []
+    registry: ''
+    repository: camunda/connectors-bundle
+    tag: 8.4.5
+  inbound:
+    auth:
+      existingSecret: ''
+    mode: oauth
+  ingress:
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    className: nginx
+    enabled: false
+    host: ''
+    path: /
+    tls:
+      enabled: false
+      secretName: camunda-platform-connectors
+  initContainers: []
+  livenessProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/liveness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  logging:
+    level:
+      io.camunda.connector: ERROR
+  metrics:
+    prometheus: /actuator/prometheus
+  nodeSelector: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1003
+  readinessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  replicas: 1
+  resources:
+    limits:
+      cpu: 2
+      memory: 2Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+  service:
+    annotations: {}
+    serverName: http
+    serverPort: 8080
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: false
+    enabled: false
+    name: ''
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  tolerations: []
+console:
+  affinity: {}
+  command: []
+  configuration: ''
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsUser: 1001
+  contextPath: ''
+  enabled: false
+  env: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  image:
+    pullSecrets: []
+    registry: registry.camunda.cloud
+    repository: console/console-sm
+    tag: 8.4.5
+  ingress:
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    className: nginx
+    enabled: false
+    host: ''
+    path: /
+    tls:
+      enabled: false
+      secretName: camunda-platform-console
+  initContainers: []
+  livenessProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /health/liveness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  logging: {}
+  metrics:
+    prometheus: /prometheus
+  nodeSelector: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+  readinessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  replicas: 1
+  resources:
+    limits:
+      cpu: 2
+      memory: 2Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+  service:
+    annotations: {}
+    managementPort: 9100
+    port: 80
+    serverName: http
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: false
+    enabled: true
+    name: ''
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  tolerations: []
+elasticsearch:
+  coordinating:
+    replicaCount: 0
+  data:
+    replicaCount: 0
+  enabled: true
+  extraVolumeMounts:
+    - mountPath: /tmp
+      name: tmp
+    - mountPath: /usr/share/elasticsearch/logs
+      name: logs
+    - mountPath: /usr/share/elasticsearch/config
+      name: config-dir
+  extraVolumes:
+    - emptyDir: {}
+      name: tmp
+    - emptyDir: {}
+      name: logs
+    - emptyDir: {}
+      name: config-dir
+  image:
+    repository: bitnami/elasticsearch
+    tag: 8.9.2
+  ingest:
+    enabled: false
+  master:
+    extraEnvVars:
+      - name: ELASTICSEARCH_ENABLE_REST_TLS
+        value: 'false'
+    heapSize: 1024m
+    masterOnly: false
+    persistence:
+      size: 64Gi
+    resources:
+      limits:
+        cpu: 2
+        memory: 2Gi
+      requests:
+        cpu: 1
+        memory: 2Gi
+  sysctlImage:
+    enabled: true
+global:
+  annotations: {}
+  createReleaseInfo: true
+  elasticsearch:
+    clusterName: elasticsearch
+    disableExporter: false
+    host: '{{ .Release.Name }}-elasticsearch'
+    port: 9200
+    prefix: zeebe-record
+    protocol: http
+    url: null
+  identity:
+    auth:
+      connectors:
+        clientId: connectors
+        existingSecret: ''
+      console:
+        audience: console-api
+        existingSecret: null
+        redirectUrl: 'http://localhost:8080'
+      enabled: true
+      identity:
+        audience: camunda-identity-resource-server
+        clientId: identity
+        existingSecret: null
+        initialClaimName: oid
+        initialClaimValue: null
+        redirectUrl: 'http://camunda-identity.apps.ocp.seatechit.com.vn'
+      issuer: ''
+      issuerBackendUrl: ''
+      jwksUrl: ''
+      operate:
+        audience: operate-api
+        clientId: operate
+        existingSecret: null
+        redirectUrl: 'http://camunda-operate.apps.ocp.seatechit.com.vn'
+      optimize:
+        audience: optimize-api
+        clientId: optimize
+        existingSecret: null
+        redirectUrl: 'http://camunda-optimize.apps.ocp.seatechit.com.vn'
+      publicIssuerUrl: 'http://camunda-keycloak.apps.ocp.seatechit.com.vn/auth/realms/camunda-platform'
+      tasklist:
+        audience: tasklist-api
+        clientId: tasklist
+        existingSecret: null
+        redirectUrl: 'http://camunda-tasklist.apps.ocp.seatechit.com.vn'
+      tokenUrl: ''
+      type: KEYCLOAK
+      webModeler:
+        clientApiAudience: web-modeler-api
+        clientId: web-modeler
+        publicApiAudience: web-modeler-public-api
+        redirectUrl: 'http://localhost:8084'
+      zeebe:
+        audience: zeebe-api
+        clientId: zeebe
+        existingSecret: ''
+        tokenScope: null
+    keycloak:
+      legacy: true
+      auth: {}
+      contextPath: /auth
+      internal: false
+      realm: /realms/camunda-platform
+      url: {}
+    service:
+      url: null
+  image:
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+    registry: ''
+    tag: 8.4.5
+  ingress:
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    className: nginx
+    enabled: false
+    host: ''
+    tls:
+      enabled: false
+      secretName: camunda-platform
+  labels:
+    app: camunda-platform
+  multiregion:
+    installationType: normal
+    regionId: 0
+    regions: 1
+  multitenancy:
+    enabled: false
+  zeebeClusterName: '{{ .Release.Name }}-zeebe'
+  zeebePort: 26500
+identity:
+  fullURL: "http://camunda-identity.apps.ocp.seatechit.com.vn"
+  affinity: {}
+  command: []
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1005
+  contextPath: ''
+  enabled: true
+  env: []
+  externalDatabase:
+    database: null
+    enabled: false
+    existingSecret: null
+    existingSecretPasswordKey: null
+    host: null
+    password: null
+    port: null
+    username: null
+  extraVolumeMounts: []
+  extraVolumes: []
+  firstUser:
+    email: demo@example.org
+    enabled: true
+    existingSecret: ''
+    firstName: Demo
+    lastName: User
+    password: demo
+    username: demo
+  fullnameOverride: ''
+  image:
+    pullSecrets: []
+    registry: ''
+    repository: camunda/identity
+    tag: null
+  ingress:
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    className: nginx
+    enabled: false
+    host: ''
+    path: /
+    tls:
+      enabled: false
+      secretName: camunda-platform-identity
+  initContainers: []
+  keycloak:
+    auth:
+      adminUser: admin
+      existingSecret: ''
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1001
+      seccompProfile:
+        type: RuntimeDefault
+    enabled: true
+    extraEnvVars:
+      - name: KEYCLOAK_PROXY_ADDRESS_FORWARDING
+        value: '{{ .Values.global.ingress.tls.enabled }}'
+    extraVolumeMounts:
+      - mountPath: /opt/bitnami/keycloak/conf/
+        name: config
+      - mountPath: /opt/bitnami/keycloak/lib/quarkus
+        name: quarkus
+      - mountPath: /opt/bitnami/keycloak/themes/identity
+        name: camunda-theme
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /opt/bitnami/keycloak/data/tmp
+        name: data-tmp
+    extraVolumes:
+      - emptyDir: {}
+        name: config
+      - emptyDir: {}
+        name: quarkus
+      - emptyDir: {}
+        name: tmp
+      - emptyDir: {}
+        name: data-tmp
+      - emptyDir:
+          sizeLimit: 10Mi
+        name: camunda-theme
+    httpRelativePath: /auth/
+    image:
+      repository: bitnami/keycloak
+      tag: 22.0.5
+    ingress:
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      enabled: false
+      extraTls: []
+      tls: false
+    initContainers:
+      - command:
+          - sh
+          - '-c'
+          - cp -a /app/keycloak-theme/* /mnt
+        image: >-
+          {{- $identityImageParams := (dict "base" .Values.global "overlay"
+          .Values.global.identity) -}} {{- include
+          "camundaPlatform.imageByParams" $identityImageParams }}
+        imagePullPolicy: '{{ .Values.global.image.pullPolicy }}'
+        name: copy-camunda-theme
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1005
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+          - mountPath: /mnt
+            name: camunda-theme
+      - command:
+          - sh
+          - '-c'
+          - >-
+            cp -ar /opt/bitnami/keycloak/conf/* /config && cp -a
+            /opt/bitnami/keycloak/lib/quarkus/* /quarkus
+        image: >-
+          {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{
+          .Values.image.tag }}
+        imagePullPolicy: Always
+        name: copy-configs
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+          - mountPath: /config
+            name: config
+          - mountPath: /quarkus
+            name: quarkus
+    podSecurityContext:
+      fsGroup: 1001
+    postgresql:
+      image:
+        repository: bitnami/postgresql
+        tag: 15.6.0
+      primary:
+        containerSecurityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          enabled: true
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        extraVolumeMounts:
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /opt/bitnami/postgresql/conf
+            name: config
+          - mountPath: /opt/bitnami/postgresql/tmp
+            name: postgresql-tmp
+        extraVolumes:
+          - emptyDir: {}
+            name: tmp
+          - emptyDir: {}
+            name: config
+          - emptyDir: {}
+            name: postgresql-tmp
+        podSecurityContext:
+          enabled: true
+          fsGroup: 1001
+          runAsNonRoot: true
+    proxy: edge
+    service:
+      type: ClusterIP
+    tls:
+      enabled: false
+  livenessProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  metrics:
+    prometheus: /actuator/prometheus
+  nameOverride: ''
+  nodeSelector: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1005
+  postgresql:
+    auth:
+      database: identity
+      existingSecret: null
+      password: null
+      username: identity
+      
+    enabled: false
+    image:
+      repository: bitnami/postgresql
+      tag: 15.6.0
+    nameOverride: identity-postgresql
+  readinessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 600m
+      memory: 400Mi
+  service:
+    annotations: {}
+    metricsName: metrics
+    metricsPort: 82
+    port: 80
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: true
+    enabled: true
+    name: ''
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  tolerations: []
+operate:
+  affinity: {}
+  command: []
+  configMap:
+    defaultMode: 484
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsUser: 1004
+  contextPath: ''
+  enabled: true
+  env: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  image:
+    pullSecrets: []
+    registry: ''
+    repository: camunda/operate
+    tag: null
+  ingress:
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    className: nginx
+    enabled: false
+    host: ''
+    path: /
+    tls:
+      enabled: false
+      secretName: camunda-platform-operate
+  initContainers: []
+  livenessProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/liveness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  logging:
+    level:
+      ROOT: INFO
+      io.camunda.operate: INFO
+  metrics:
+    prometheus: /actuator/prometheus
+  nodeSelector: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1000
+    runAsNonRoot: true
+  readinessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 600m
+      memory: 400Mi
+  retention:
+    enabled: false
+    minimumAge: 30d
+  service:
+    annotations: {}
+    port: 80
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: false
+    enabled: true
+    name: ''
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  tolerations: []
+optimize:
+  affinity: {}
+  command: []
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsUser: 100
+  contextPath: ''
+  enabled: true
+  env: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  image:
+    pullSecrets: []
+    registry: ''
+    repository: camunda/optimize
+    tag: 8.4.2
+  ingress:
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    className: nginx
+    enabled: false
+    host: ''
+    path: /
+    tls:
+      enabled: false
+      secretName: camunda-platform-optimize
+  initContainers: []
+  livenessProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /api/readyz
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  metrics:
+    prometheus: /actuator/prometheus
+  migration:
+    enabled: true
+    env: []
+  nodeSelector: {}
+  partitionCount: '1'
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 100
+    runAsNonRoot: true
+  readinessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /api/readyz
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 600m
+      memory: 1Gi
+  service:
+    annotations: {}
+    managementPort: 8092
+    port: 80
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: false
+    enabled: true
+    name: ''
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /api/readyz
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  tolerations: []
+postgresql:
+  auth:
+    database: web-modeler
+    password: ''
+    username: web-modeler
+  enabled: false
+  nameOverride: postgresql-web-modeler
+  primary:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      enabled: true
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1001
+      seccompProfile:
+        type: RuntimeDefault
+    extraVolumeMounts:
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /opt/bitnami/postgresql/conf
+        name: config
+      - mountPath: /opt/bitnami/postgresql/tmp
+        name: postgresql-tmp
+    extraVolumes:
+      - emptyDir: {}
+        name: tmp
+      - emptyDir: {}
+        name: config
+      - emptyDir: {}
+        name: postgresql-tmp
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+      runAsNonRoot: true
+prometheusServiceMonitor:
+  enabled: false
+  labels:
+    release: metrics
+  scrapeInterval: 10s
+tasklist:
+  affinity: {}
+  command: []
+  configMap:
+    defaultMode: 484
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsUser: 1002
+  contextPath: ''
+  enabled: true
+  env: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  identity:
+    userAccessRestrictions:
+      enabled: true
+  image:
+    pullSecrets: []
+    registry: ''
+    repository: camunda/tasklist
+    tag: null
+  ingress:
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    className: nginx
+    enabled: false
+    host: ''
+    path: /
+    tls:
+      enabled: false
+      secretName: camunda-platform-tasklist
+  initContainers: []
+  livenessProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/liveness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  metrics:
+    prometheus: /actuator/prometheus
+  nodeSelector: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1002
+    runAsNonRoot: true
+  readinessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 400m
+      memory: 1Gi
+  retention:
+    enabled: false
+    minimumAge: 30d
+  service:
+    annotations: {}
+    port: 80
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: false
+    enabled: true
+    name: ''
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  tolerations: []
+webModeler:
+  contextPath: ''
+  enabled: false
+  fullnameOverride: ''
+  image:
+    pullSecrets: []
+    registry: registry.camunda.cloud
+    tag: 8.4.5
+  ingress:
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    className: nginx
+    enabled: false
+    webapp:
+      host: ''
+      tls:
+        enabled: false
+        secretName: camunda-platform-webmodeler-webapp
+    websockets:
+      host: ''
+      tls:
+        enabled: false
+        secretName: camunda-platform-webmodeler-websockets
+  nameOverride: ''
+  restapi:
+    affinity: {}
+    command: []
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+    env: []
+    externalDatabase:
+      password: ''
+      url: ''
+      user: ''
+    extraVolumeMounts: []
+    extraVolumes: []
+    image:
+      repository: web-modeler-ee/modeler-restapi
+    initContainers: []
+    livenessProbe:
+      enabled: false
+      failureThreshold: 5
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      probePath: /health/liveness
+      scheme: HTTP
+      successThreshold: 1
+      timeoutSeconds: 1
+    mail:
+      fromAddress: ''
+      fromName: Camunda 8
+      smtpHost: ''
+      smtpPassword: ''
+      smtpPort: 587
+      smtpTlsEnabled: true
+      smtpUser: ''
+    metrics:
+      prometheus: /metrics
+    nodeSelector: {}
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext:
+      fsGroup: 1000
+      runAsNonRoot: true
+    readinessProbe:
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      probePath: /health/readiness
+      scheme: HTTP
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    service:
+      annotations: {}
+      managementPort: 8091
+      port: 80
+      type: ClusterIP
+    sidecars: []
+    startupProbe:
+      enabled: false
+      failureThreshold: 5
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      probePath: /health/liveness
+      scheme: HTTP
+      successThreshold: 1
+      timeoutSeconds: 1
+    tolerations: []
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: false
+    enabled: true
+    name: ''
+  webapp:
+    affinity: {}
+    command: []
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+    env: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    image:
+      repository: web-modeler-ee/modeler-webapp
+    initContainers: []
+    livenessProbe:
+      enabled: false
+      failureThreshold: 5
+      initialDelaySeconds: 15
+      periodSeconds: 30
+      probePath: /health/liveness
+      scheme: HTTP
+      successThreshold: 1
+      timeoutSeconds: 1
+    metrics:
+      prometheus: /metrics
+    nodeSelector: {}
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext:
+      fsGroup: 1000
+      runAsNonRoot: true
+    readinessProbe:
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 15
+      periodSeconds: 30
+      probePath: /health/readiness
+      scheme: HTTP
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits:
+        cpu: 800m
+        memory: 512Mi
+      requests:
+        cpu: 400m
+        memory: 256Mi
+    service:
+      annotations: {}
+      managementPort: 8071
+      port: 80
+      type: ClusterIP
+    sidecars: []
+    startupProbe:
+      enabled: false
+      failureThreshold: 5
+      initialDelaySeconds: 15
+      periodSeconds: 30
+      probePath: /health/liveness
+      scheme: HTTP
+      successThreshold: 1
+      timeoutSeconds: 1
+    tolerations: []
+  websockets:
+    affinity: {}
+    command: []
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+    env: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    image:
+      repository: web-modeler-ee/modeler-websockets
+    initContainers: []
+    livenessProbe:
+      enabled: false
+      failureThreshold: 5
+      initialDelaySeconds: 10
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 1
+    nodeSelector: {}
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext:
+      fsGroup: 1000
+      runAsNonRoot: true
+    publicHost: localhost
+    publicPort: 8085
+    readinessProbe:
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 10
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi
+    service:
+      annotations: {}
+      port: 80
+      type: ClusterIP
+    sidecars: []
+    startupProbe:
+      enabled: false
+      failureThreshold: 5
+      initialDelaySeconds: 10
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 1
+    tolerations: []
+zeebe:
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: In
+                values:
+                  - zeebe-broker
+          topologyKey: kubernetes.io/hostname
+  clusterSize: '1'
+  command: []
+  configMap:
+    defaultMode: 492
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsUser: 1000
+  cpuThreadCount: '1'
+  debug: false
+  enabled: true
+  env:
+    - name: ZEEBE_BROKER_DATA_SNAPSHOTPERIOD
+      value: 5m
+    - name: ZEEBE_BROKER_DATA_DISK_FREESPACE_REPLICATION
+      value: 2GB
+    - name: ZEEBE_BROKER_DATA_DISK_FREESPACE_PROCESSING
+      value: 3GB
+  extraInitContainers: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  image:
+    pullSecrets: []
+    registry: ''
+    repository: camunda/zeebe
+    tag: null
+  initContainers: []
+  ioThreadCount: '3'
+  javaOpts: >-
+    -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/zeebe/data
+    -XX:ErrorFile=/usr/local/zeebe/data/zeebe_error%p.log
+    -XX:+ExitOnOutOfMemoryError
+  livenessProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/liveness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  log4j2: ''
+  logLevel: info
+  metrics:
+    prometheus: /actuator/prometheus
+  nodeSelector: {}
+  partitionCount: '1'
+  persistenceType: disk
+  podAnnotations: {}
+  podDisruptionBudget:
+    enabled: false
+    maxUnavailable: 1
+    minAvailable: null
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1000
+    runAsNonRoot: true
+  priorityClassName: ''
+  pvcAccessModes:
+    - ReadWriteOnce
+  pvcAnnotations: {}
+  pvcSize: 32Gi
+  pvcStorageClassName: ''
+  readinessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  replicationFactor: '1'
+  resources:
+    limits:
+      cpu: 960m
+      memory: 1920Mi
+    requests:
+      cpu: 800m
+      memory: 1200Mi
+  retention:
+    enabled: false
+    minimumAge: 30d
+    policyName: zeebe-record-retention-policy
+  service:
+    annotations: {}
+    commandName: command
+    commandPort: 26501
+    extraPorts: []
+    httpName: http
+    httpPort: 9600
+    internalName: internal
+    internalPort: 26502
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: false
+    enabled: true
+    name: ''
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/startup
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  tolerations: []
+zeebe-gateway:
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: In
+                values:
+                  - zeebe-gateway
+          topologyKey: kubernetes.io/hostname
+  command: []
+  configMap:
+    defaultMode: 484
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+  env: []
+  extraInitContainers: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  image:
+    pullSecrets: []
+    registry: ''
+    repository: camunda/zeebe
+    tag: null
+  ingress:
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    className: nginx
+    enabled: false
+    host: ''
+    path: /
+    tls:
+      enabled: false
+      secretName: camunda-platform-zeebe-gateway
+  initContainers: []
+  javaOpts: '-XX:+ExitOnOutOfMemoryError'
+  livenessProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/liveness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  log4j2: ''
+  logLevel: info
+  metrics:
+    prometheus: /actuator/prometheus
+  nodeSelector: {}
+  podAnnotations: {}
+  podDisruptionBudget:
+    enabled: false
+    maxUnavailable: null
+    minAvailable: 1
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1000
+    runAsNonRoot: true
+  priorityClassName: ''
+  readinessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/readiness
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  replicas: 1
+  resources:
+    limits:
+      cpu: 400m
+      memory: 450Mi
+    requests:
+      cpu: 400m
+      memory: 450Mi
+  service:
+    annotations: {}
+    gatewayName: gateway
+    gatewayPort: 26500
+    httpName: http
+    httpPort: 9600
+    internalName: internal
+    internalPort: 26502
+    loadBalancerIP: ''
+    loadBalancerSourceRanges: []
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: false
+    enabled: true
+    name: ''
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    probePath: /actuator/health/startup
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  tolerations: []
